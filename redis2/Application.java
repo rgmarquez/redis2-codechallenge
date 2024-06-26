@@ -15,15 +15,20 @@ public class Application {
 		MultiThreadedServer server = new MultiThreadedServer(SERVER_PORT);
 		new Thread(server).start();
 
-		// For testing, we only run the server for a limited time...
-		// remove sleep and server.stop(), and add this.wait()
-		// to run the server until it is halted from an outside source
+		// Add a shutdown hook to stop the server gracefully
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			System.out.println("Shutting down server...");
+			server.stop();
+		}));
+
+		// Put the main thread to sleep indefinitely
 		try {
-		    Thread.sleep(SECONDS_TO_RUN * 1000);
+			while (true) {
+				Thread.sleep(Long.MAX_VALUE);
+			}
 		} catch (InterruptedException e) {
-		    e.printStackTrace();
+			// Handle interruption, if needed
+			System.out.println("Main thread interrupted");
 		}
-		System.out.println("Stopping Server");
-		server.stop();
 	}
 }
